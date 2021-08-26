@@ -22,16 +22,16 @@ retval = video_capture.isOpened()
 
 process_this_frame = True
 runtime = 0
-
+scale = 0.25
 while runtime < 1:
     # Grab a single frame of video or read file
     if retval:
         ret, frame = video_capture.read()
     else:
-        frame = cv2.imread('.\\testimage\\couple.jpg')
+        frame = cv2.imread('.\\testimage\\two_people.jpg')
 
     # Resize frame of video to 1/4 size for faster face recognition processing
-    small_frame = cv2.resize(frame, (0, 0), fx=0.3, fy=0.3)
+    small_frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
@@ -74,23 +74,29 @@ while runtime < 1:
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-
+        top *= int(1/scale)
+        right *= int(1/scale)
+        bottom *= int(1/scale)
+        left *= int(1/scale)
         # Draw a box around the face
-        cv2.rectangle(small_frame, (left, top),
+        cv2.rectangle(frame, (left, top),
                       (right, bottom), (0, 0, 255), 4)
 
         # Draw a label with a name below the face
-        cv2.rectangle(small_frame, (left, bottom - 15),
+        cv2.rectangle(frame, (left, bottom - 30),
                       (right, bottom), (0, 0, 255), cv2.FILLED)
-        font = cv2.FONT_HERSHEY_PLAIN
-        cv2.putText(small_frame, name, (left + 6, bottom - 3),
-                    font, 1.0, (255, 255, 255), 1)
+        font = cv2.FONT_HERSHEY_TRIPLEX
+        cv2.putText(frame, name, (left + 6, bottom - 3),
+                    font, 2.0, (255, 255, 255), thickness=3)
 
     # Display the resulting imageq
-    cv2.imshow('Video', small_frame)
+    if retval:
+        cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
-    if cv2.waitKey(1) & 0xFF == ord('q') or cv2.waitKey(1) & 0xFF == 27:
+    if cv2.waitKey(1) & 0xFF == ord('q') or cv2.waitKey(1) & 0xFF == 27 or not(retval):
+        if not(retval):
+            cv2.imwrite("Result.jpg", frame)
         break
 
 # Release handle to the webcam
