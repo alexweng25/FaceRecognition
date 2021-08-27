@@ -4,7 +4,6 @@ import time
 import numpy as np
 import cv2
 import pickle
-import device
 
 # Get Face Model from file
 with open("FaceData.data", 'rb') as fr:
@@ -22,7 +21,7 @@ retval = video_capture.isOpened()
 
 process_this_frame = True
 runtime = 0
-scale = 0.25
+scale = 1
 while runtime < 1:
     # Grab a single frame of video or read file
     if retval:
@@ -80,14 +79,14 @@ while runtime < 1:
         left *= int(1/scale)
         # Draw a box around the face
         cv2.rectangle(frame, (left, top),
-                      (right, bottom), (0, 0, 255), 4)
+                      (right, bottom), (0, 0, 255), 3)
 
         # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 30),
+        cv2.rectangle(frame, (left, bottom - 20),
                       (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_TRIPLEX
         cv2.putText(frame, name, (left + 6, bottom - 3),
-                    font, 2.0, (255, 255, 255), thickness=3)
+                    font, 0.8, (255, 255, 255), thickness=2)
 
     # Display the resulting imageq
     if retval:
